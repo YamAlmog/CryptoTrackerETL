@@ -1,8 +1,22 @@
-# Compiled class file
+# Compiled class files
 *.class
 
-# Log file
+# Maven target dir
+/target/
+
+# Logs
 *.log
+
+# IntelliJ files
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
 
 # BlueJ files
 *.ctxt
