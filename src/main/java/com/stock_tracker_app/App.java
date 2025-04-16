@@ -6,6 +6,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class App {
+    public static int SCHEDUAL_FIXED_RATE = 30;
+    public static int TOTAL_PAGES = 5;
 
     public static void main(String[] args) {
         CryptoPriceFetcher fetcher = new CryptoPriceFetcher();
@@ -15,7 +17,7 @@ public class App {
 
         Runnable fetchTask = () -> {
             try {
-                fetcher.getCryptoPrices();
+                fetcher.getCryptoPrices(TOTAL_PAGES);
             } catch (IOException e) {
                 System.err.println("IOException during fetch:");
                 e.printStackTrace();
@@ -30,8 +32,8 @@ public class App {
         consumerThread.start();
         
         System.out.println("Starting scheduled crypto price fetcher...");
-        // Schedule the task to run every 30 seconds, with no initial delay
-        scheduler.scheduleAtFixedRate(fetchTask, 0, 30, TimeUnit.SECONDS);
+        // Schedule the task to run every SCHEDUAL_FIXED_RATE seconds, with no initial delay
+        scheduler.scheduleAtFixedRate(fetchTask, 0, SCHEDUAL_FIXED_RATE, TimeUnit.SECONDS);
 
         // Graceful shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
