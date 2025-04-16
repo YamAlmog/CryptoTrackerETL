@@ -1,4 +1,4 @@
-package com.stock_tracker_app;
+package com.crypto_tracker_app;
 
 import java.io.IOException;
 import java.net.URI;

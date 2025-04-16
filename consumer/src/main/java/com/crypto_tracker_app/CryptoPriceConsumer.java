@@ -1,4 +1,4 @@
-package com.stock_tracker_app;
+package com.crypto_tracker_app;
 
 import java.time.Duration;
 import java.util.Collections;

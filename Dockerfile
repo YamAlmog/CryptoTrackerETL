@@ -27,5 +27,5 @@ RUN mvn clean package -DskipTests
 EXPOSE 8080
 
 # Run the app with the JDBC driver in the classpath and your compiled JAR
-CMD ["java", "-cp", "target/app.jar:postgresql.jar", "com.stock_tracker_app.App"]
+CMD ["java", "-cp", "target/app.jar:postgresql.jar", "com.crypto_tracker_app.App"]
 
