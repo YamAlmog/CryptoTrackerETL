@@ -1,20 +1,28 @@
 package com.stock_tracker_app;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Properties;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.json.JSONArray;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class CryptoPriceFetcher {
     private static final String KAFKA_BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
     private static final String TOPIC = "crypto-prices";
+    private static final String COINGECKO_API_KEY = System.getenv("COINGECKO_API_KEY");
 
     private final KafkaProducer<String, String> producer;
 
@@ -28,47 +36,44 @@ public class CryptoPriceFetcher {
         this.producer = new KafkaProducer<>(props);
     }
 
-    public void getCryptoPrices(List<String> coinIds) throws IOException, InterruptedException {
-        if (coinIds.isEmpty()) {
-            System.out.println("No coins provided.");
-            return;
-        }
+    public void getCryptoPrices() throws IOException, InterruptedException {
+        System.out.println("-------------- Start running getCryptoPrices function ---------------");
+        String url = String.format("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=%d", 1);
 
-        String idsParam = String.join(",", coinIds);
-        System.out.println("--------------------------- idsParam -------------------------"+idsParam);
-        String url = String.format("https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=usd", idsParam);
+        System.out.println("Request URL: " + url);
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
+            .header("x-cg-demo-api-key", COINGECKO_API_KEY)
             .build();
-
+        
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("Response: " + response.body());
 
         if (response.statusCode() != 200) {
             System.err.println("Failed to fetch crypto prices. Status: " + response.statusCode());
+            System.err.println("Failed to fetch crypto prices. Body: " + response.body());
             return;
         }
 
-        JSONObject prices = new JSONObject(response.body());
+        JSONArray coins = new JSONArray(response.body());
         String timestamp = Instant.now().toString();
 
-        for (String coin : coinIds) {
-            if (!prices.has(coin)) {
-                System.err.println("No data found for: " + coin);
-                continue;
-            }
+        // Convert JSONArray to List<Coin>
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        List<Coin> coinList = mapper.readValue(coins.toString(), new TypeReference<List<Coin>>() {});
 
-            double price = prices.getJSONObject(coin).getDouble("usd");
+        // Loop through each Coin object and send it as JSON to Kafka
+        for (Coin coin : coinList) {
+            String coinId = coin.getId(); // use as Kafka key
+            coin.setCurrTimestamp(timestamp); // set the curr timestamp for coin object
+            String coinJson = mapper.writeValueAsString(coin); // full coin object as JSON string
 
-            JSONObject messageJson = new JSONObject();
-            messageJson.put("symbol", coin);
-            messageJson.put("price", price);
-            messageJson.put("timestamp", timestamp);
-
-            System.out.printf("%s: $%.2f at %s%n", coin, price, timestamp);
-
-            producer.send(new ProducerRecord<>(TOPIC, coin, messageJson.toString()));
+            System.out.printf("Sending %s: %s%n", coinId, coinJson);
+            producer.send(new ProducerRecord<>(TOPIC, coinId, coinJson));
         }
 
         producer.flush();
