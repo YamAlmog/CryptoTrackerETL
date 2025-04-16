@@ -21,7 +21,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class CryptoPriceFetcher {
     private static final String KAFKA_BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
-    private static final String TOPIC = "crypto-prices";
+    private static final String TOPIC = System.getenv("KAFKA_TOPIC");
     private static final String COINGECKO_API_KEY = System.getenv("COINGECKO_API_KEY");
 
     private final KafkaProducer<String, String> producer;
@@ -49,8 +49,6 @@ public class CryptoPriceFetcher {
             .build();
         
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        System.out.println("Response: " + response.body());
 
         if (response.statusCode() != 200) {
             System.err.println("Failed to fetch crypto prices. Status: " + response.statusCode());

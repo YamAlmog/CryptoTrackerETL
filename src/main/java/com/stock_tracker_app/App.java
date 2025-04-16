@@ -9,8 +9,7 @@ public class App {
 
     public static void main(String[] args) {
         CryptoPriceFetcher fetcher = new CryptoPriceFetcher();
-
-        System.out.println("Starting scheduled crypto price fetcher...");
+        CryptoPriceConsumer consumer = new CryptoPriceConsumer();
 
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -25,8 +24,13 @@ public class App {
                 Thread.currentThread().interrupt(); // good practice
             }
         };
-
-        // Schedule the task to run every 20 seconds, with no initial delay
+        System.out.println("Starting consumer thread...");
+        // Start the consumer in a background thread
+        Thread consumerThread = new Thread(consumer::startConsuming);
+        consumerThread.start();
+        
+        System.out.println("Starting scheduled crypto price fetcher...");
+        // Schedule the task to run every 30 seconds, with no initial delay
         scheduler.scheduleAtFixedRate(fetchTask, 0, 30, TimeUnit.SECONDS);
 
         // Graceful shutdown hook

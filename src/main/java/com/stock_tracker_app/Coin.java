@@ -70,7 +70,7 @@ public class Coin {
         this.name = name;
     }
 
-    public String getTimestamp() {
+    public String getCurrTimestamp() {
         return currTimestamp;
     }
 
@@ -164,5 +164,26 @@ public class Coin {
 
     public void setLastUpdated(ZonedDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    @Override
+    public String toString() {
+        return "Coin{" +
+                "id='" + id + '\'' +
+                ", symbol='" + symbol + '\'' +
+                ", name='" + name + '\'' +
+                ", currTimestamp='" + currTimestamp + '\'' +
+                ", currentPrice=" + currentPrice +
+                ", marketCap=" + marketCap +
+                ", marketCapRank=" + marketCapRank +
+                ", totalVolume=" + totalVolume +
+                ", high24h=" + high24h +
+                ", low24h=" + low24h +
+                ", ath=" + ath +
+                ", athDate=" + athDate +
+                ", atl=" + atl +
+                ", atlDate=" + atlDate +
+                ", lastUpdated=" + lastUpdated +
+                '}';
     }
 }

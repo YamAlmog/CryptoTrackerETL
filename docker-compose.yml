@@ -7,11 +7,17 @@ services:
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: stockDB
+      POSTGRES_DB: cryptoDB
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d cryptoDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
       
   pgadmin:
     image: dpage/pgadmin4
@@ -50,14 +56,17 @@ services:
     build: .
     container_name: java-app
     depends_on:
-      - db
-      - kafka
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     environment:
-      DB_URL: jdbc:postgresql://db:5432/stockDB
+      DB_URL: jdbc:postgresql://db:5432/cryptoDB
       DB_USER: myuser
       DB_PASSWORD: mypassword
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       COINGECKO_API_KEY: CG-JQNfV5Pxa5QZxQPb57SxSsAa 
+      KAFKA_TOPIC: crypto-prices
 
 volumes:
   pgdata:
