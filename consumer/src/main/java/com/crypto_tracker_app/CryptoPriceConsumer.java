@@ -18,6 +18,8 @@ public class CryptoPriceConsumer {
     private static final String TOPIC = System.getenv("KAFKA_TOPIC");
     private static final String GROUP_ID = "crypto-price-consumer-group";
 
+    private KafkaConsumer<String, String> consumer;
+    
     DBManager dbManager = new DBManager();
     private final ObjectMapper mapper;
 
@@ -36,8 +38,9 @@ public class CryptoPriceConsumer {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                 "org.apache.kafka.common.serialization.StringDeserializer");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        consumer = new KafkaConsumer<>(props);
 
-        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
+        try{
             consumer.subscribe(Collections.singletonList(TOPIC));
             System.out.println("Started consuming from topic: " + TOPIC);
 
@@ -50,13 +53,23 @@ public class CryptoPriceConsumer {
                         Coin coin = mapper.readValue(jsonValue, Coin.class);
                         System.out.printf("----------------->>> Consumer Received %s: %s%n", key, coin);
                         dbManager.insertCoinToDB(coin);
-                        // You can add more processing here (save to DB, alerting, etc.)
                     } catch (Exception e) {
                         System.err.println("Failed to parse message: " + jsonValue);
                         e.printStackTrace();
                     }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close();  // Ensure that we close the consumer when done
+        }
+    }
+
+    public void close() {
+        if (consumer != null) {
+            System.out.println("Closing Kafka consumer...");
+            consumer.close();  // Graceful shutdown
         }
     }
 }
