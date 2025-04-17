@@ -52,9 +52,26 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  app:
-    build: .
-    container_name: java-app
+  producer:
+    build: 
+      context: .
+      dockerfile: producer/Dockerfile
+    container_name: java-producer
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      COINGECKO_API_KEY: CG-JQNfV5Pxa5QZxQPb57SxSsAa 
+      KAFKA_TOPIC: crypto-prices
+
+  consumer:
+    build: 
+      context: .
+      dockerfile: consumer/Dockerfile
+    container_name: java-consumer
     depends_on:
       db:
         condition: service_healthy
@@ -65,7 +82,6 @@ services:
       DB_USER: myuser
       DB_PASSWORD: mypassword
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      COINGECKO_API_KEY: CG-JQNfV5Pxa5QZxQPb57SxSsAa 
       KAFKA_TOPIC: crypto-prices
 
 volumes:
