@@ -12,6 +12,7 @@
         <module>shared</module>
         <module>producer</module>
         <module>consumer</module>
+        <module>token-metadata-api</module>
     </modules>
 
     <properties>

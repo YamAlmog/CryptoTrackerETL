@@ -6,6 +6,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Properties;
 
@@ -44,7 +47,6 @@ public class CryptoPriceFetcher {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
-        String timestamp = Instant.now().toString();
 
         for(int page = 1; page < totalPages; page++){    
             
@@ -73,6 +75,7 @@ public class CryptoPriceFetcher {
             // Loop through each Coin object and send it as JSON to Kafka
             for (Coin coin : coinList) {
                 String coinId = coin.getId(); // use as Kafka key
+                ZonedDateTime timestamp = ZonedDateTime.now(ZoneOffset.UTC).withNano(0); // Truncate nanoseconds
                 coin.setCurrTimestamp(timestamp); // set the curr timestamp for coin object
                 String coinJson = mapper.writeValueAsString(coin); // full coin object as JSON string
 

@@ -11,7 +11,7 @@ public class Coin {
     private String id;
     private String symbol;
     private String name;
-    private String currTimestamp;
+    private ZonedDateTime currTimestamp;
 
     @JsonProperty("current_price")
     private Double currentPrice;
@@ -70,11 +70,11 @@ public class Coin {
         this.name = name;
     }
 
-    public String getCurrTimestamp() {
+    public ZonedDateTime getCurrTimestamp() {
         return currTimestamp;
     }
 
-    public void setCurrTimestamp(String currTimestamp) {
+    public void setCurrTimestamp(ZonedDateTime currTimestamp) {
         this.currTimestamp = currTimestamp;
     }
 

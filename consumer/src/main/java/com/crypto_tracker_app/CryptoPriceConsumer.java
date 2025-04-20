@@ -20,7 +20,7 @@ public class CryptoPriceConsumer {
 
     private KafkaConsumer<String, String> consumer;
     
-    DBManager dbManager = new DBManager();
+    CoinStorageManager CoinStorageManager = new CoinStorageManager();
     private final ObjectMapper mapper;
 
     public CryptoPriceConsumer() {
@@ -52,7 +52,7 @@ public class CryptoPriceConsumer {
                     try {
                         Coin coin = mapper.readValue(jsonValue, Coin.class);
                         System.out.printf("----------------->>> Consumer Received %s: %s%n", key, coin);
-                        dbManager.insertCoinToDB(coin);
+                        CoinStorageManager.insertCoinToDB(coin);
                     } catch (Exception e) {
                         System.err.println("Failed to parse message: " + jsonValue);
                         e.printStackTrace();

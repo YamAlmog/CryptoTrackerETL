@@ -1,2 +1,2 @@
 com\crypto_tracker_app\Coin.class
-com\crypto_tracker_app\DBManager.class
+com\crypto_tracker_app\CoinStorageManager.class

@@ -1,0 +1,3 @@
+com\crypto_tracker_app\controller\TokenController.class
+com\crypto_tracker_app\service\TokenService.class
+com\crypto_tracker_app\TokenMetadataApiApp.class
