@@ -37,59 +37,66 @@ public class CryptoPriceFetcher {
         this.producer = new KafkaProducer<>(props);
     }
 
-    public void getCryptoPrices(int totalPages) throws IOException, InterruptedException {
+
+    public void getCryptoPrices(int totalPages) {
         System.out.println("-------------- Start running getCryptoPrices function ---------------");
-        long startTime = System.currentTimeMillis(); // start timing
+        long startTime = System.currentTimeMillis();
+        HttpClient httpClient = HttpClient.newHttpClient();
+        ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-        HttpClient client = HttpClient.newHttpClient();
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-
-
-        for(int page = 1; page < totalPages; page++){    
-            
-            String url = String.format("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=%d", page);
-
-            System.out.println("Request URL: " + url);
-
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("x-cg-demo-api-key", COINGECKO_API_KEY)
-                .build();
-            
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() != 200) {
-                System.err.println("Failed to fetch crypto prices. Status: " + response.statusCode());
-                System.err.println("Failed to fetch crypto prices. Body: " + response.body());
-                return;
+        for (int page = 1; page < totalPages; page++) {
+            try {
+                String json = fetchPageFromCoinGecko(page, httpClient);
+                List<Coin> coins = convertToCoinList(json, mapper);
+                sendCoinsToKafka(coins, mapper);
+            } catch (IOException | InterruptedException e) {
+                System.err.printf("Error processing page %d: %s%n", page, e.getMessage());
+                e.printStackTrace();
             }
-
-            JSONArray coins = new JSONArray(response.body());
-
-            // Convert JSONArray to List<Coin>
-            List<Coin> coinList = mapper.readValue(coins.toString(), new TypeReference<List<Coin>>() {});
-
-            // Loop through each Coin object and send it as JSON to Kafka
-            for (Coin coin : coinList) {
-                String coinId = coin.getId(); // use as Kafka key
-                ZonedDateTime timestamp = ZonedDateTime.now(ZoneOffset.UTC).withNano(0); // Truncate nanoseconds
-                coin.setCurrTimestamp(timestamp); // set the curr timestamp for coin object
-                String coinJson = mapper.writeValueAsString(coin); // full coin object as JSON string
-
-                System.out.printf("Sending %s: %s%n", coinId, coinJson);
-                producer.send(new ProducerRecord<>(TOPIC, coinId, coinJson));
-            }
-
-            producer.flush();
-
         }
-        
-        long endTime = System.currentTimeMillis(); // End timing
-        long durationSeconds = (endTime - startTime) / 1000;
-        System.out.println("Total fetch time: " + durationSeconds + " seconds");
 
+        long durationSeconds = (System.currentTimeMillis() - startTime) / 1000;
+        System.out.println("Total fetch time: " + durationSeconds + " seconds");
     }
+
+    private String fetchPageFromCoinGecko(int page, HttpClient httpClient) throws IOException, InterruptedException {
+        String url = String.format("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=%d", page);
+        System.out.println("Request URL: " + url);
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .header("x-cg-demo-api-key", COINGECKO_API_KEY)
+            .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new IOException("API request failed with status: " + response.statusCode() + " Body: " + response.body());
+        }
+
+        return response.body();
+    }
+
+    private List<Coin> convertToCoinList(String json, ObjectMapper mapper) throws IOException {
+        JSONArray coins = new JSONArray(json);
+        return mapper.readValue(coins.toString(), new TypeReference<List<Coin>>() {});
+    }
+
+    private void sendCoinsToKafka(List<Coin> coins, ObjectMapper mapper) throws IOException {
+        for (Coin coin : coins) {
+            ZonedDateTime timestamp = ZonedDateTime.now(ZoneOffset.UTC).withNano(0); // Truncate nanoseconds
+            coin.setCurrTimestamp(timestamp);
+
+            String coinJson = mapper.writeValueAsString(coin);
+            System.out.printf("Sending %s: %s%n", coin.getId(), coinJson);
+            producer.send(new ProducerRecord<>(TOPIC, coin.getId(), coinJson));
+        }
+
+        producer.flush();
+    }
+        
+
+    
 
     public void close() {
         producer.close();

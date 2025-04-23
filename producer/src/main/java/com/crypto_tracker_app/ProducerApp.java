@@ -17,12 +17,9 @@ public class ProducerApp {
         Runnable fetchTask = () -> {
             try {
                 fetcher.getCryptoPrices(TOTAL_PAGES);
-            } catch (IOException e) {
-                System.err.println("IOException during fetch:");
+            } catch (Exception e) {
+                System.err.println("Unexpected error:");
                 e.printStackTrace();
-            } catch (InterruptedException e) {
-                System.err.println("Fetch interrupted:");
-                Thread.currentThread().interrupt();
             }
         };
 

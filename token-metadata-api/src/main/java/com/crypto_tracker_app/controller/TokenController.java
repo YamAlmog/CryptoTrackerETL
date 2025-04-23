@@ -17,13 +17,13 @@ public class TokenController {
     }
 
     @GetMapping("/latest/{symbol}")
-    public Coin getLatestToken(@PathVariable String symbol) {
+    public Coin getLatestPriceBySymbol(@PathVariable String symbol) {
         System.out.println("---------> Get latest price of token: " + symbol);
         return tokenService.getLatestTokenPriceBySymbol(symbol);
     }
 
     @GetMapping("/highest/{symbol}")
-    public Coin getHighestToken(@PathVariable String symbol) {
+    public Coin getHighestPriceBySymbol(@PathVariable String symbol) {
         System.out.println("---------> Get highest price of token: " + symbol);
         return tokenService.getHighestTokenPriceBySymbol(symbol);
     }

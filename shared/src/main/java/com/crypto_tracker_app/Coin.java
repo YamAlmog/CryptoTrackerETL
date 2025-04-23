@@ -46,7 +46,9 @@ public class Coin {
     @JsonProperty("last_updated")
     private ZonedDateTime lastUpdated;
 
-    // Constractors
+    // Constractors...
+    public Coin() {}
+
     public Coin(String id, String symbol, String name, Double currentPrice, Long marketCap, Double high24h, Double low24h){
         this.id = id;
         this.symbol = symbol;
