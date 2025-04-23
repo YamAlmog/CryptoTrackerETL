@@ -3,9 +3,11 @@ package com.crypto_tracker_app;
 import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Coin {
 
     private String id;
@@ -44,8 +46,19 @@ public class Coin {
     @JsonProperty("last_updated")
     private ZonedDateTime lastUpdated;
 
-    // Getters and Setters...
+    // Constractors
+    public Coin(String id, String symbol, String name, Double currentPrice, Long marketCap, Double high24h, Double low24h){
+        this.id = id;
+        this.symbol = symbol;
+        this.name = name;
+        this.currentPrice = currentPrice;
+        this.marketCap = marketCap;
+        this.high24h = high24h;
+        this.low24h = low24h;
+    }
 
+
+    // Getters and Setters...
     public String getId() {
         return id;
     }

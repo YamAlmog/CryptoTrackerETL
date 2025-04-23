@@ -1,16 +1,11 @@
 package com.crypto_tracker_app;
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-
+import com.crypto_tracker_app.Coin;
 
 public class CoinStorageManager {
 
@@ -30,38 +25,38 @@ public class CoinStorageManager {
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (id, curr_timestamp) DO NOTHING;
         """;
-
+    
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+    
             pstmt.setString(1, coin.getId());
             pstmt.setString(2, coin.getSymbol());
             pstmt.setString(3, coin.getName());
-            pstmt.setString(4, coin.getCurrTimestamp().toString());
-            pstmt.setDouble(5, coin.getCurrentPrice());
-            pstmt.setLong(6, coin.getMarketCap());
-            pstmt.setInt(7, coin.getMarketCapRank());
-            pstmt.setLong(8, coin.getTotalVolume());
-            pstmt.setDouble(9, coin.getHigh24h());
-            pstmt.setDouble(10, coin.getLow24h());
-            pstmt.setDouble(11, coin.getAth());
-            pstmt.setString(12, coin.getAthDate().toString());
-            pstmt.setDouble(13, coin.getAtl());
-            pstmt.setString(14, coin.getAtlDate().toString());
-            pstmt.setString(15, coin.getLastUpdated().toString());
-
+            pstmt.setString(4, coin.getCurrTimestamp() != null ? coin.getCurrTimestamp().toString() : null);
+            pstmt.setObject(5, coin.getCurrentPrice(), java.sql.Types.DOUBLE);
+            pstmt.setObject(6, coin.getMarketCap(), java.sql.Types.BIGINT);
+            pstmt.setObject(7, coin.getMarketCapRank(), java.sql.Types.INTEGER);
+            pstmt.setObject(8, coin.getTotalVolume(), java.sql.Types.BIGINT);
+            pstmt.setObject(9, coin.getHigh24h(), java.sql.Types.DOUBLE);
+            pstmt.setObject(10, coin.getLow24h(), java.sql.Types.DOUBLE);
+            pstmt.setObject(11, coin.getAth(), java.sql.Types.DOUBLE);
+            pstmt.setString(12, coin.getAthDate() != null ? coin.getAthDate().toString() : null);
+            pstmt.setObject(13, coin.getAtl(), java.sql.Types.DOUBLE);
+            pstmt.setString(14, coin.getAtlDate() != null ? coin.getAtlDate().toString() : null);
+            pstmt.setString(15, coin.getLastUpdated() != null ? coin.getLastUpdated().toString() : null);
+    
             pstmt.executeUpdate();
             System.out.println("Coin inserted: " + coin.getId() + " @ " + coin.getCurrTimestamp());
-
+    
         } catch (SQLException e) {
             System.err.println("Error inserting coin: " + coin.getId());
             e.printStackTrace();
         }
     }
 
-    public Coin getLatestCoinBySymbol(String symbol) throws SQLException {
+    public Coin getLatestPriceBySymbol(String symbol) throws SQLException {
         String sql = """
-            SELECT * FROM coins
+            SELECT id, symbol, name, current_price, market_cap, low_24h, high_24h FROM coins
             WHERE symbol = ?
             ORDER BY curr_timestamp DESC
             LIMIT 1
@@ -72,32 +67,29 @@ public class CoinStorageManager {
     
             pstmt.setString(1, symbol);
             ResultSet rs = pstmt.executeQuery();
-    
+            
             if (rs.next()) {
-                System.out.println("Looking for symbol: '" + symbol + "'");
-                System.out.println("Executing query...");
                 return buildCoinFromResultSet(rs);
             } else {
-                System.out.println("No result found for symbol: '" + symbol + "'");
                 return null;
             }
         }
     }
     
-    public Coin getHighestCoinBySymbol(String symbol) throws SQLException {
+    public Coin getHighestPriceBySymbol(String symbol) throws SQLException {
         String sql = """
-            SELECT * FROM coins
+            SELECT id, symbol, name, current_price, market_cap, low_24h, high_24h FROM coins
             WHERE symbol = ?
             ORDER BY current_price DESC
             LIMIT 1
         """;
     
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
     
             pstmt.setString(1, symbol);
             ResultSet rs = pstmt.executeQuery();
-    
+            
             if (rs.next()) {
                 return buildCoinFromResultSet(rs);
             } else {
@@ -107,25 +99,15 @@ public class CoinStorageManager {
     }
 
     public Coin buildCoinFromResultSet(ResultSet rs) throws SQLException {
-        Coin coin = new Coin();
-        coin.setId(rs.getString("id"));
-        coin.setSymbol(rs.getString("symbol"));
-        coin.setName(rs.getString("name"));
-        
-        // Convert timestamp (UTC in DB) back to ZonedDateTime
-        coin.setCurrTimestamp(rs.getObject("curr_timestamp", ZonedDateTime.class));
+        String id = rs.getString("id");
+        String coin_symbol = rs.getString("symbol");
+        String name =  rs.getString("name");
+        Double curr_price = rs.getDouble("current_price");
+        Long market_cap = rs.getLong("market_cap");
+        double low_24h =  rs.getDouble("high_24h");
+        double high_24h  = rs.getDouble("low_24h");
 
-        coin.setCurrentPrice(rs.getDouble("current_price"));
-        coin.setMarketCap(rs.getLong("market_cap"));
-        coin.setMarketCapRank(rs.getInt("market_cap_rank"));
-        coin.setTotalVolume(rs.getLong("total_volume"));
-        coin.setHigh24h(rs.getDouble("high_24h"));
-        coin.setLow24h(rs.getDouble("low_24h"));
-        coin.setAth(rs.getDouble("ath"));
-        coin.setAthDate(rs.getTimestamp("ath_date").toLocalDateTime().atZone(ZoneId.systemDefault()));
-        coin.setAtl(rs.getDouble("atl"));
-        coin.setAtlDate(rs.getTimestamp("atl_date").toLocalDateTime().atZone(ZoneId.systemDefault()));
-        coin.setLastUpdated(rs.getTimestamp("last_updated").toLocalDateTime().atZone(ZoneId.systemDefault()));
+        Coin coin = new Coin(id, coin_symbol, name, curr_price, market_cap, low_24h, high_24h);
         return coin;
     }
 }
