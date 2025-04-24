@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CoinStorageManager {
 
@@ -51,6 +53,25 @@ public class CoinStorageManager {
             System.err.println("Error inserting coin: " + coin.getId());
             e.printStackTrace();
         }
+    }
+
+    public List<String> getAllTokenSymbols() throws SQLException {
+        System.out.println("---------> inside CoinStorageManager getAllTokenSymbols function");
+        String sql = "SELECT DISTINCT symbol FROM coins";
+        List<String> symbols = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery()) {
+            if(!rs.next()){
+                System.out.println("---------> Problem with rs.next- is empty");
+                return null;
+            }
+            while (rs.next()) {
+                symbols.add(rs.getString("symbol"));
+            }
+            
+        }
+        return symbols;
     }
 
     public Coin getLatestPriceBySymbol(String symbol) throws SQLException {

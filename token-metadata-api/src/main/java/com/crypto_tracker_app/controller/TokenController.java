@@ -2,6 +2,8 @@ package com.crypto_tracker_app.controller;
 
 import com.crypto_tracker_app.Coin;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.crypto_tracker_app.service.TokenService;
@@ -14,6 +16,13 @@ public class TokenController {
 
     public TokenController(TokenService tokenService) {
         this.tokenService = tokenService;
+    }
+
+
+    @GetMapping("/all_symbols")
+    public List<String> getAllTrackedTokensSymbols() {
+        System.out.println("---------> Get list of tokens symbols");
+        return tokenService.getAllTokenSymbols();
     }
 
     @GetMapping("/latest/{symbol}")
