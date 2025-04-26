@@ -20,9 +20,15 @@ public class TokenController {
 
 
     @GetMapping("/all_symbols")
-    public List<String> getAllTrackedTokensSymbols() {
+    public List<String> getAllTokensSymbols() {
         System.out.println("---------> Get list of tokens symbols");
         return tokenService.getAllTokenSymbols();
+    }
+
+    @GetMapping("/all_ids")
+    public List<String> getAllTokensIds() {
+        System.out.println("---------> Get list of tokens ids");
+        return tokenService.getAllTokenIds();
     }
 
     @GetMapping("/latest/{symbol}")
@@ -37,9 +43,4 @@ public class TokenController {
         return tokenService.getHighestTokenPriceBySymbol(symbol);
     }
 
-    @GetMapping("/test/{word}")
-    public String test_endpoint(@PathVariable String word) {
-        System.out.println("---------> Word: " + word);
-        return word;
-    }
 }

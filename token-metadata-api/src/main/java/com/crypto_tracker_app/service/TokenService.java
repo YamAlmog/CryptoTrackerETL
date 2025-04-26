@@ -34,6 +34,23 @@ public class TokenService {
         }
     }
 
+
+    public List<String> getAllTokenIds() {
+        try {
+            List<String> ids = coinStorageManager.getAllTokenIds();
+            if (ids == null) {
+                throw new SQLException();
+            }
+            return ids;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to retrieve Ids");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Unexpected error occurred");
+        }
+    }
+
     public Coin getLatestTokenPriceBySymbol(String symbol) {
         try {
             System.out.println("---------> inside getLatestTokenBySymbol function");

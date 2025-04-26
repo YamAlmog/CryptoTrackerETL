@@ -61,7 +61,7 @@ public class CoinStorageManager {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
             if(!rs.next()){
-                System.out.println("---------> Problem with rs.next- is empty");
+                System.out.println("---------> rs.next - is empty");
                 return null;
             }
             while (rs.next()) {
@@ -70,6 +70,26 @@ public class CoinStorageManager {
             
         }
         return symbols;
+    }
+
+
+    public List<String> getAllTokenIds() throws SQLException {
+        System.out.println("---------> inside CoinStorageManager getAllTokenIds function");
+        String sql = "SELECT DISTINCT id FROM coins";
+        List<String> idsList = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery()) {
+            if(!rs.next()){
+                System.out.println("---------> rs.next - is empty");
+                return null;
+            }
+            while (rs.next()) {
+                idsList.add(rs.getString("id"));
+            }
+            
+        }
+        return idsList;
     }
 
     public Coin getLatestPriceBySymbol(String symbol) throws SQLException {
@@ -118,14 +138,14 @@ public class CoinStorageManager {
 
     public Coin buildCoinFromResultSet(ResultSet rs) throws SQLException {
         String id = rs.getString("id");
-        String coin_symbol = rs.getString("symbol");
+        String coinSymbol = rs.getString("symbol");
         String name =  rs.getString("name");
-        Double curr_price = rs.getDouble("current_price");
-        Long market_cap = rs.getLong("market_cap");
-        double low_24h =  rs.getDouble("high_24h");
-        double high_24h  = rs.getDouble("low_24h");
+        Double currPrice = rs.getDouble("current_price");
+        Long marketCap = rs.getLong("market_cap");
+        double low24h =  rs.getDouble("high_24h");
+        double high24h  = rs.getDouble("low_24h");
 
-        Coin coin = new Coin(id, coin_symbol, name, curr_price, market_cap, low_24h, high_24h);
+        Coin coin = new Coin(id, coinSymbol, name, currPrice, marketCap, low24h, high24h);
         return coin;
     }
 }
