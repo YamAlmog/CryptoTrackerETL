@@ -18,16 +18,17 @@ import org.json.JSONArray;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-public class CryptoPriceFetcher {
+public class CryptoMarketDataFetcher {
     private static final String KAFKA_BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
     private static final String TOPIC = System.getenv("KAFKA_TOPIC");
     private static final String COINGECKO_API_KEY = System.getenv("COINGECKO_API_KEY");
 
     private final KafkaProducer<String, String> producer;
 
-    public CryptoPriceFetcher() {
+    public CryptoMarketDataFetcher() {
         // Kafka config
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_BOOTSTRAP_SERVERS);
@@ -38,16 +39,18 @@ public class CryptoPriceFetcher {
     }
 
 
-    public void getCryptoPrices(int totalPages) {
-        System.out.println("-------------- Start running getCryptoPrices function ---------------");
+    public void getCryptoMetadata(int totalPages) {
+        System.out.println("-------------- Start running getCryptoMetadata function ---------------");
         long startTime = System.currentTimeMillis();
         HttpClient httpClient = HttpClient.newHttpClient();
-        ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        ObjectMapper mapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         for (int page = 1; page < totalPages; page++) {
             try {
-                String json = fetchPageFromCoinGecko(page, httpClient);
-                List<Coin> coins = convertToCoinList(json, mapper);
+                String fetchedPage = fetchPageFromCoinGecko(page, httpClient);
+                List<Coin> coins = convertToCoinList(fetchedPage, mapper);
                 sendCoinsToKafka(coins, mapper);
             } catch (IOException | InterruptedException e) {
                 System.err.printf("Error processing page %d: %s%n", page, e.getMessage());
@@ -77,16 +80,13 @@ public class CryptoPriceFetcher {
         return response.body();
     }
 
-    private List<Coin> convertToCoinList(String json, ObjectMapper mapper) throws IOException {
-        JSONArray coins = new JSONArray(json);
+    private List<Coin> convertToCoinList(String pageData, ObjectMapper mapper) throws IOException {
+        JSONArray coins = new JSONArray(pageData);
         return mapper.readValue(coins.toString(), new TypeReference<List<Coin>>() {});
     }
 
     private void sendCoinsToKafka(List<Coin> coins, ObjectMapper mapper) throws IOException {
         for (Coin coin : coins) {
-            ZonedDateTime timestamp = ZonedDateTime.now(ZoneOffset.UTC).withNano(0); // Truncate nanoseconds
-            coin.setCurrTimestamp(timestamp);
-
             String coinJson = mapper.writeValueAsString(coin);
             System.out.printf("Sending %s: %s%n", coin.getId(), coinJson);
             producer.send(new ProducerRecord<>(TOPIC, coin.getId(), coinJson));
@@ -96,7 +96,6 @@ public class CryptoPriceFetcher {
     }
         
 
-    
 
     public void close() {
         producer.close();

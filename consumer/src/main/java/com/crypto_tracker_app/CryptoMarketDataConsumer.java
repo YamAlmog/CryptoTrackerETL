@@ -12,7 +12,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-public class CryptoPriceConsumer {
+public class CryptoMarketDataConsumer {
 
     private static final String BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
     private static final String TOPIC = System.getenv("KAFKA_TOPIC");
@@ -23,7 +23,7 @@ public class CryptoPriceConsumer {
     private final CoinStorageManager coinStorageManager;
     private final ObjectMapper mapper;
 
-    public CryptoPriceConsumer() {
+    public CryptoMarketDataConsumer() {
         coinStorageManager = new CoinStorageManager();
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());

@@ -20,10 +20,10 @@ public class CoinStorageManager {
     public void insertCoinToDB(Coin coin) {
         String sql = """
             INSERT INTO coins (
-                id, symbol, name, curr_timestamp, current_price,
+                id, symbol, name, current_price,
                 market_cap, market_cap_rank, total_volume, high_24h, low_24h,
-                ath, ath_date, atl, atl_date, last_updated
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ath, ath_date, atl, atl_date
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (id, curr_timestamp) DO NOTHING;
         """;
     
@@ -33,18 +33,16 @@ public class CoinStorageManager {
             pstmt.setString(1, coin.getId());
             pstmt.setString(2, coin.getSymbol());
             pstmt.setString(3, coin.getName());
-            pstmt.setString(4, coin.getCurrTimestamp() != null ? coin.getCurrTimestamp().toString() : null);
-            pstmt.setObject(5, coin.getCurrentPrice(), java.sql.Types.DOUBLE);
-            pstmt.setObject(6, coin.getMarketCap(), java.sql.Types.BIGINT);
-            pstmt.setObject(7, coin.getMarketCapRank(), java.sql.Types.INTEGER);
-            pstmt.setObject(8, coin.getTotalVolume(), java.sql.Types.BIGINT);
-            pstmt.setObject(9, coin.getHigh24h(), java.sql.Types.DOUBLE);
-            pstmt.setObject(10, coin.getLow24h(), java.sql.Types.DOUBLE);
-            pstmt.setObject(11, coin.getAth(), java.sql.Types.DOUBLE);
-            pstmt.setString(12, coin.getAthDate() != null ? coin.getAthDate().toString() : null);
-            pstmt.setObject(13, coin.getAtl(), java.sql.Types.DOUBLE);
-            pstmt.setString(14, coin.getAtlDate() != null ? coin.getAtlDate().toString() : null);
-            pstmt.setString(15, coin.getLastUpdated() != null ? coin.getLastUpdated().toString() : null);
+            pstmt.setObject(4, coin.getCurrentPrice(), java.sql.Types.DOUBLE);
+            pstmt.setObject(5, coin.getMarketCap(), java.sql.Types.BIGINT);
+            pstmt.setObject(6, coin.getMarketCapRank(), java.sql.Types.INTEGER);
+            pstmt.setObject(7, coin.getTotalVolume(), java.sql.Types.BIGINT);
+            pstmt.setObject(8, coin.getHigh24h(), java.sql.Types.DOUBLE);
+            pstmt.setObject(9, coin.getLow24h(), java.sql.Types.DOUBLE);
+            pstmt.setObject(10, coin.getAth(), java.sql.Types.DOUBLE);
+            pstmt.setString(11, coin.getAthDate() != null ? coin.getAthDate().toString() : null);
+            pstmt.setObject(12, coin.getAtl(), java.sql.Types.DOUBLE);
+            pstmt.setString(13, coin.getAtlDate() != null ? coin.getAtlDate().toString() : null);
     
             pstmt.executeUpdate();
             System.out.println("Coin inserted: " + coin.getId() + " @ " + coin.getCurrTimestamp());

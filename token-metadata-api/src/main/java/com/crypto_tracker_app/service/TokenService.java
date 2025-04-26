@@ -27,7 +27,10 @@ public class TokenService {
             return symbols;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Database error");
+            throw new RuntimeException("Failed to retrieve Symbols");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Unexpected error occurred");
         }
     }
 

@@ -1,2 +1,2 @@
-com\crypto_tracker_app\CryptoPriceConsumer.class
+com\crypto_tracker_app\CryptoMarketDataConsumer.class
 com\crypto_tracker_app\ConsumerApp.class

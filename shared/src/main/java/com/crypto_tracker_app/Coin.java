@@ -13,6 +13,8 @@ public class Coin {
     private String id;
     private String symbol;
     private String name;
+    
+    @JsonProperty("curr_timestamp")
     private ZonedDateTime currTimestamp;
 
     @JsonProperty("current_price")
@@ -43,8 +45,6 @@ public class Coin {
     @JsonProperty("atl_date")
     private ZonedDateTime atlDate;  // allow nulls here
 
-    @JsonProperty("last_updated")
-    private ZonedDateTime lastUpdated;
 
     // Constractors...
     public Coin() {}
@@ -173,13 +173,6 @@ public class Coin {
         this.atlDate = atlDate;
     }
 
-    public ZonedDateTime getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(ZonedDateTime lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
 
     @Override
     public String toString() {
@@ -198,7 +191,6 @@ public class Coin {
                 ", athDate=" + athDate +
                 ", atl=" + atl +
                 ", atlDate=" + atlDate +
-                ", lastUpdated=" + lastUpdated +
                 '}';
     }
 }

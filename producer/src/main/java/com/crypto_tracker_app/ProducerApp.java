@@ -10,13 +10,13 @@ public class ProducerApp {
     public static int TOTAL_PAGES = 5;
 
     public static void main(String[] args) {
-        CryptoPriceFetcher fetcher = new CryptoPriceFetcher();
+        CryptoMarketDataFetcher fetcher = new CryptoMarketDataFetcher();
 
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
         Runnable fetchTask = () -> {
             try {
-                fetcher.getCryptoPrices(TOTAL_PAGES);
+                fetcher.getCryptoMetadata(TOTAL_PAGES);
             } catch (Exception e) {
                 System.err.println("Unexpected error:");
                 e.printStackTrace();
