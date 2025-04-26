@@ -61,7 +61,6 @@ public class CoinStorageManager {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
             if(!rs.next()){
-                System.out.println("---------> rs.next - is empty");
                 return null;
             }
             while (rs.next()) {
@@ -81,7 +80,6 @@ public class CoinStorageManager {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
             if(!rs.next()){
-                System.out.println("---------> rs.next - is empty");
                 return null;
             }
             while (rs.next()) {

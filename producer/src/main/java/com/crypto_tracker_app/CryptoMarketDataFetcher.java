@@ -25,6 +25,7 @@ public class CryptoMarketDataFetcher {
     private static final String KAFKA_BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
     private static final String TOPIC = System.getenv("KAFKA_TOPIC");
     private static final String COINGECKO_API_KEY = System.getenv("COINGECKO_API_KEY");
+    private static final String URL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=%d";
 
     private final KafkaProducer<String, String> producer;
 
@@ -39,8 +40,8 @@ public class CryptoMarketDataFetcher {
     }
 
 
-    public void getCryptoMetadata(int totalPages) {
-        System.out.println("-------------- Start running getCryptoMetadata function ---------------");
+    public void getCryptoCoinsInfo(int totalPages) {
+        System.out.println("-------------- Start running getCryptoCoinsInfo function ---------------");
         long startTime = System.currentTimeMillis();
         HttpClient httpClient = HttpClient.newHttpClient();
         ObjectMapper mapper = new ObjectMapper()
@@ -63,8 +64,7 @@ public class CryptoMarketDataFetcher {
     }
 
     private String fetchPageFromCoinGecko(int page, HttpClient httpClient) throws IOException, InterruptedException {
-        String url = String.format("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=%d", page);
-        System.out.println("Request URL: " + url);
+        String url = String.format(URL, page);
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))

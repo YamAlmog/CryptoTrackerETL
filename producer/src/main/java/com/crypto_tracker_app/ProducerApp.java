@@ -1,13 +1,12 @@
 package com.crypto_tracker_app;
 
-import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ProducerApp {
-    public static int SCHEDUAL_FIXED_RATE = 30;
-    public static int TOTAL_PAGES = 5;
+    public static final int SCHEDUAL_FIXED_RATE = 30;
+    public static final int TOTAL_PAGES = 5;
 
     public static void main(String[] args) {
         CryptoMarketDataFetcher fetcher = new CryptoMarketDataFetcher();
@@ -16,7 +15,7 @@ public class ProducerApp {
 
         Runnable fetchTask = () -> {
             try {
-                fetcher.getCryptoMetadata(TOTAL_PAGES);
+                fetcher.getCryptoCoinsInfo(TOTAL_PAGES);
             } catch (Exception e) {
                 System.err.println("Unexpected error:");
                 e.printStackTrace();

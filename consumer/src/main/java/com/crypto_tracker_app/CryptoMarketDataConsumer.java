@@ -17,6 +17,7 @@ public class CryptoMarketDataConsumer {
     private static final String BOOTSTRAP_SERVERS = System.getenv("KAFKA_BOOTSTRAP_SERVERS");
     private static final String TOPIC = System.getenv("KAFKA_TOPIC");
     private static final String GROUP_ID = "crypto-price-consumer-group";
+    private static final long POLL_TIMEOUT_MS = 1000;
 
     private KafkaConsumer<String, String> consumer;
     
@@ -46,7 +47,7 @@ public class CryptoMarketDataConsumer {
             System.out.println("Started consuming from topic: " + TOPIC);
 
             while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS));
                 for (ConsumerRecord<String, String> record : records) {
                     String key = record.key();
                     String jsonValue = record.value();
