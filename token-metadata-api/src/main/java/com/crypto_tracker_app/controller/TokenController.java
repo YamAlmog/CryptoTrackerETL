@@ -1,17 +1,22 @@
 package com.crypto_tracker_app.controller;
 
-import com.crypto_tracker_app.Coin;
-
 import java.util.List;
 
-import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.crypto_tracker_app.Coin;
 import com.crypto_tracker_app.service.TokenService;
 
 @RestController
 @RequestMapping("/tokens")
 public class TokenController {
 
+    private static final Logger logger = LoggerFactory.getLogger(TokenController.class);
     private final TokenService tokenService;
 
     public TokenController(TokenService tokenService) {
@@ -21,25 +26,25 @@ public class TokenController {
 
     @GetMapping("/all_symbols")
     public List<String> getAllTokensSymbols() {
-        System.out.println("---------> Get list of tokens symbols");
+        logger.info("---------> Get list of tokens symbols");
         return tokenService.getAllTokenSymbols();
     }
 
     @GetMapping("/all_ids")
     public List<String> getAllTokensIds() {
-        System.out.println("---------> Get list of tokens ids");
+        logger.info("---------> Get list of tokens ids");
         return tokenService.getAllTokenIds();
     }
 
     @GetMapping("/latest/{symbol}")
     public Coin getLatestPriceBySymbol(@PathVariable String symbol) {
-        System.out.println("---------> Get latest price of token: " + symbol);
+        logger.info("---------> Get latest record of token: " + symbol);
         return tokenService.getLatestTokenPriceBySymbol(symbol);
     }
 
     @GetMapping("/highest/{symbol}")
     public Coin getHighestPriceBySymbol(@PathVariable String symbol) {
-        System.out.println("---------> Get highest price of token: " + symbol);
+        logger.info("---------> Get highest price record of token: " + symbol);
         return tokenService.getHighestTokenPriceBySymbol(symbol);
     }
 
