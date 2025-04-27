@@ -1,16 +1,32 @@
-# Crypto Market Tracker ETL
+# Crypto Market Tracker ETL 🚀
 
-This project implements a complete ETL pipeline for real-time cryptocurrency market data. 
-It collects live data from the CoinGecko API, streams it through Apache Kafka, and stores it in a PostgreSQL database with historical tracking and automatic timestamping. 
-In addition, a Spring Boot web service exposes a REST API for accessing token metadata directly from the database. 
-The entire system is containerized with Docker for easy deployment.
+A real-time ETL pipeline for cryptocurrency market data, built with Kafka, PostgreSQL, and Spring Boot.
+
+
+### Project Highlights:
+
+🔄 Collects live data from the CoinGecko API.
+
+📨 Streams data through Apache Kafka (Producer app).
+
+🛢️ Stores historical snapshots into PostgreSQL with automatic timestamping (Consumer app).
+
+🌐 Exposes a REST API with Spring Boot to access token metadata.
+
+📦 Fully containerized using Docker and Docker Compose for easy deployment.
+
+
+flowchart LR
+  A[🌎 CoinGecko API] --> B[⚡ Kafka Producer App]
+  B --> C[🛠️ Apache Kafka]
+  C --> D[⚙️ Kafka Consumer App]
+  D --> E[🛢️ PostgreSQL Database]
+  E --> F[🌐 Spring Boot API Service]
+
 
 ## How to Run the Project with Docker
 
-On your host machine:
-
+```bash
 cd CryptoTrackerETL
-
 mvn clean install -DskipTests
-
 docker-compose up --build
