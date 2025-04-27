@@ -15,13 +15,6 @@ A real-time ETL pipeline for cryptocurrency market data, built with Kafka, Postg
 
 📦 Fully containerized using Docker and Docker Compose for easy deployment.
 
-## How to Run the Project with Docker
-
-```bash
-cd CryptoTrackerETL
-mvn clean install -DskipTests
-docker-compose up --build
-
 
 ## System Flow
 
@@ -32,7 +25,13 @@ flowchart LR
     C --> D[⚙️ Kafka Consumer App]
     D --> E[🛢️ PostgreSQL Database]
     E --> F[🌐 Spring Boot API Service]
+```
 
 
+## How to Run the Project with Docker
 
-
+```bash
+cd CryptoTrackerETL
+mvn clean install -DskipTests
+docker-compose up --build
+```
