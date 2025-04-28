@@ -5,7 +5,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ProducerApp {
-    public static final int SCHEDUAL_FIXED_RATE = 30;
+    public static final int SCHEDUAL_FIXED_RATE = 60;
     public static final int TOTAL_PAGES = 5;
 
     public static void main(String[] args) {

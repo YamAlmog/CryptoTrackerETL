@@ -1,9 +1,9 @@
 package com.crypto_tracker_app.controller;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +16,7 @@ import com.crypto_tracker_app.service.TokenService;
 @RequestMapping("/tokens")
 public class TokenController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TokenController.class);
+    private static final Logger logger = Logger.getLogger(TokenController.class.getName());
     private final TokenService tokenService;
 
     public TokenController(TokenService tokenService) {
@@ -38,13 +38,13 @@ public class TokenController {
 
     @GetMapping("/latest/{symbol}")
     public Coin getLatestPriceBySymbol(@PathVariable String symbol) {
-        logger.info("---------> Get latest record of token: " + symbol);
+        logger.log(Level.INFO, "---------> Get latest record of token: ", symbol);
         return tokenService.getLatestTokenPriceBySymbol(symbol);
     }
 
     @GetMapping("/highest/{symbol}")
     public Coin getHighestPriceBySymbol(@PathVariable String symbol) {
-        logger.info("---------> Get highest price record of token: " + symbol);
+        logger.log(Level.INFO, "---------> Get highest price record of token: ", symbol);
         return tokenService.getHighestTokenPriceBySymbol(symbol);
     }
 
