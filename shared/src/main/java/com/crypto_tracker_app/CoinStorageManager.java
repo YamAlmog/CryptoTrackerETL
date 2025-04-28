@@ -7,13 +7,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CoinStorageManager {
 
     private static final String URL = System.getenv("DB_URL");    
     private static final String USER = System.getenv("DB_USER");
     private static final String PASSWORD = System.getenv("DB_PASSWORD");
-
+    private static final Logger logger = Logger.getLogger(CoinStorageManager.class.getName());
     public CoinStorageManager() {}
 
 
@@ -45,16 +47,15 @@ public class CoinStorageManager {
             pstmt.setString(13, coin.getAtlDate() != null ? coin.getAtlDate().toString() : null);
     
             pstmt.executeUpdate();
-            System.out.println("Coin inserted: " + coin.getId() + " @ " + coin.getCurrTimestamp());
+            logger.log(Level.INFO, "Coin inserted: ", coin.getId());
     
         } catch (SQLException e) {
-            System.err.println("Error inserting coin: " + coin.getId());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error inserting coin: "+ coin.getId(), e);
         }
     }
 
     public List<String> getAllTokenSymbols() throws SQLException {
-        System.out.println("---------> inside CoinStorageManager getAllTokenSymbols function");
+        logger.info("---------> Inside CoinStorageManager getAllTokenSymbols function");
         String sql = "SELECT DISTINCT symbol FROM coins";
         List<String> symbols = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -67,13 +68,16 @@ public class CoinStorageManager {
                 symbols.add(rs.getString("symbol"));
             }
             
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error retrieving token symbols", e);
+            throw e;  // Re-throw the exception after logging it
         }
         return symbols;
     }
 
 
     public List<String> getAllTokenIds() throws SQLException {
-        System.out.println("---------> inside CoinStorageManager getAllTokenIds function");
+        logger.info("---------> Inside CoinStorageManager getAllTokenIds function");
         String sql = "SELECT DISTINCT id FROM coins";
         List<String> idsList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -86,6 +90,9 @@ public class CoinStorageManager {
                 idsList.add(rs.getString("id"));
             }
             
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error retrieving token Ids", e);
+            throw e;  // Re-throw the exception after logging it
         }
         return idsList;
     }
@@ -109,6 +116,9 @@ public class CoinStorageManager {
             } else {
                 return null;
             }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error retrieving latest record for symbol: "+ symbol, e);
+            throw e;  
         }
     }
     
@@ -131,6 +141,9 @@ public class CoinStorageManager {
             } else {
                 return null;
             }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error retrieving record with highest price for symbol: "+ symbol, e);
+            throw e;  
         }
     }
 
