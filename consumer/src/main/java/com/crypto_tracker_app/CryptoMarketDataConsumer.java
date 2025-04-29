@@ -3,6 +3,8 @@ package com.crypto_tracker_app;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -18,6 +20,7 @@ public class CryptoMarketDataConsumer {
     private static final String TOPIC = System.getenv("KAFKA_TOPIC");
     private static final String GROUP_ID = "crypto-price-consumer-group";
     private static final long POLL_TIMEOUT_MS = 1000;
+    private static final Logger logger = Logger.getLogger(CryptoMarketDataConsumer.class.getName());
 
     private KafkaConsumer<String, String> consumer;
     
@@ -31,7 +34,6 @@ public class CryptoMarketDataConsumer {
     }
 
     public void startConsuming() {
-        System.out.println("------------> Inside startConsuming()");
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
@@ -44,7 +46,7 @@ public class CryptoMarketDataConsumer {
 
         try{
             consumer.subscribe(Collections.singletonList(TOPIC));
-            System.out.println("Started consuming from topic: " + TOPIC);
+            logger.log(Level.INFO, "Started consuming from topic: ", TOPIC);
 
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS));
@@ -53,11 +55,10 @@ public class CryptoMarketDataConsumer {
                     String jsonValue = record.value();
                     try {
                         Coin coin = mapper.readValue(jsonValue, Coin.class);
-                        System.out.printf("----------------->>> Consumer Received %s: %s%n", key, coin);
+                        logger.info(String.format("----------------->>> Consumer Received %s: %s%n", key, coin));
                         coinStorageManager.insertCoinToDB(coin);
                     } catch (Exception e) {
-                        System.err.println("Failed to parse message: " + jsonValue);
-                        e.printStackTrace();
+                        logger.log(Level.SEVERE, "Failed to parse message: " + jsonValue, e);
                     }
                 }
             }
@@ -70,7 +71,7 @@ public class CryptoMarketDataConsumer {
 
     public void close() {
         if (consumer != null) {
-            System.out.println("Closing Kafka consumer...");
+            logger.info("Closing Kafka consumer...");
             consumer.close();  // Graceful shutdown
         }
     }

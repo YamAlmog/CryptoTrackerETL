@@ -1,15 +1,18 @@
 package com.crypto_tracker_app;
+import java.util.logging.Logger;
 
 public class ConsumerApp {
+    private static final Logger logger = Logger.getLogger(CryptoMarketDataConsumer.class.getName());
+
     public static void main(String[] args) {
         CryptoMarketDataConsumer consumer = new CryptoMarketDataConsumer(); 
         
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {   
-            System.out.println("Shutdown signal received. Closing consumer...");
+            logger.info("Shutdown signal received. Closing consumer...");
             consumer.close(); // Graceful shutdown
         }));
         
-        System.out.println("Starting Kafka consumer...");
+        logger.info("Starting Kafka consumer...");
         consumer.startConsuming();                                
     }
 }

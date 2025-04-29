@@ -59,7 +59,7 @@ public class CryptoMarketDataFetcher {
         }
 
         long durationSeconds = (System.currentTimeMillis() - startTime) / 1000;
-        logger.info("Total fetch time: " + durationSeconds + " seconds");
+        logger.info(String.format("Total fetch time: %,d seconds", durationSeconds));
     }
 
     private String fetchPageFromCoinGecko(int page, HttpClient httpClient) throws IOException, InterruptedException {

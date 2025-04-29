@@ -31,10 +31,10 @@ public class TokenService {
             return symbols;
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "SQL error occurred while retrieving symbols", e);
-            throw new RuntimeException("Failed to retrieve Symbols");
+            throw new RuntimeException();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Unexpected error occurred while retrieving symbols", e);
-            throw new RuntimeException("Unexpected Error");
+            throw new RuntimeException();
         }
     }
 
@@ -50,16 +50,16 @@ public class TokenService {
             return ids;
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "SQL error occurred while retrieving ids", e);
-            throw new RuntimeException("Failed to retrieve Ids");
+            throw new RuntimeException();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Unexpected error occurred while retrieving ids", e);
-            throw new RuntimeException("Unexpected Error");
+            throw new RuntimeException();
         }
     }
 
     public Coin getLatestTokenPriceBySymbol(String symbol) {
         try {
-            logger.log(Level.INFO, "Fetching latest token price record for symbol: ", symbol);
+            logger.log(Level.INFO, "Fetching latest record for token: ", symbol);
             Coin coin = coinStorageManager.getLatestPriceBySymbol(symbol);
             if (coin == null) {
                 throw new CoinNotFoundException(symbol);
@@ -67,16 +67,16 @@ public class TokenService {
             return coin;
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Database error occurred while fetching latest price for symbol: "+ symbol, e);
-            throw new RuntimeException("Database Error");
+            throw new RuntimeException();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Unexpected error occurred while fetching latest price for symbol: "+ symbol, e);
-            throw new RuntimeException("Unexpected Error");
+            throw new RuntimeException();
         }
     }
 
     public Coin getHighestTokenPriceBySymbol(String symbol) {
         try {
-            logger.log(Level.INFO, "---------> Fetching highest price record for token with symbol: ", symbol);
+            logger.log(Level.INFO, "Fetching highest price record for token: ", symbol);
             Coin coin = coinStorageManager.getHighestPriceBySymbol(symbol);
             if (coin == null) {
                 throw new CoinNotFoundException(symbol);
@@ -84,10 +84,10 @@ public class TokenService {
             return coin;
         } catch (SQLException e) {
             logger.log(Level.SEVERE,"Database error occurred while fetching highest price for symbol: "+ symbol, e);
-            throw new RuntimeException("Database Error");
+            throw new RuntimeException();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Unexpected error occurred while fetching highest price for symbol: "+ symbol, e);
-            throw new RuntimeException("Unexpected Error");
+            throw new RuntimeException();
         }
     }
 }
