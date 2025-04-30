@@ -9,7 +9,7 @@ A real-time ETL pipeline for cryptocurrency market data, built with Kafka, Postg
 
 📨 Streams data through Apache Kafka (Producer app).
 
-🛢️ Stores historical snapshots into PostgreSQL with automatic timestamping (Consumer app).
+🛢️ Stores token market data into PostgreSQL (Consumer app).
 
 🌐 Exposes a REST API with Spring Boot to access token metadata.
 
