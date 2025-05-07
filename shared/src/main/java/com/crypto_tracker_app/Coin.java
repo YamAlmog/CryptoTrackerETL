@@ -49,10 +49,11 @@ public class Coin {
     // Constractors...
     public Coin() {}
 
-    public Coin(String id, String symbol, String name, Double currentPrice, Long marketCap, Double high24h, Double low24h){
+    public Coin(String id, String symbol, String name,ZonedDateTime currTimestamp, Double currentPrice, Long marketCap, Double high24h, Double low24h){
         this.id = id;
         this.symbol = symbol;
         this.name = name;
+        this.currTimestamp = currTimestamp;
         this.currentPrice = currentPrice;
         this.marketCap = marketCap;
         this.high24h = high24h;

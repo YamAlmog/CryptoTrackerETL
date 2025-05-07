@@ -57,7 +57,7 @@ public class TokenService {
         }
     }
 
-    public Coin getLatestTokenPriceBySymbol(String symbol) {
+    public Coin getLatestTokenRecordBySymbol(String symbol) {
         try {
             logger.log(Level.INFO, "Fetching latest record for token: ", symbol);
             Coin coin = coinStorageManager.getLatestPriceBySymbol(symbol);
@@ -81,6 +81,7 @@ public class TokenService {
             if (coin == null) {
                 throw new CoinNotFoundException(symbol);
             }
+            logger.log(Level.INFO, "Coin response: {0}", coin);
             return coin;
         } catch (SQLException e) {
             logger.log(Level.SEVERE,"Database error occurred while fetching highest price for symbol: "+ symbol, e);

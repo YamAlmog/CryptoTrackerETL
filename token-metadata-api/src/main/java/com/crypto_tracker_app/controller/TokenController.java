@@ -37,9 +37,9 @@ public class TokenController {
     }
 
     @GetMapping("/latest/{symbol}")
-    public Coin getLatestPriceBySymbol(@PathVariable String symbol) {
+    public Coin getLatestRecordBySymbol(@PathVariable String symbol) {
         logger.log(Level.INFO, "---------> Get latest record of token: ", symbol);
-        return tokenService.getLatestTokenPriceBySymbol(symbol);
+        return tokenService.getLatestTokenRecordBySymbol(symbol);
     }
 
     @GetMapping("/highest/{symbol}")
