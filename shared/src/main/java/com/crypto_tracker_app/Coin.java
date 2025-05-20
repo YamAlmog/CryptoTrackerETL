@@ -14,6 +14,9 @@ public class Coin {
     private String symbol;
     private String name;
     
+    @JsonProperty("image")
+    private String image;
+    
     @JsonProperty("curr_timestamp")
     private ZonedDateTime currTimestamp;
 
@@ -84,6 +87,14 @@ public class Coin {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public ZonedDateTime getCurrTimestamp() {
@@ -181,6 +192,7 @@ public class Coin {
                 "id='" + id + '\'' +
                 ", symbol='" + symbol + '\'' +
                 ", name='" + name + '\'' +
+                ", image='" + image + '\'' +
                 ", currTimestamp='" + currTimestamp + '\'' +
                 ", currentPrice=" + currentPrice +
                 ", marketCap=" + marketCap +

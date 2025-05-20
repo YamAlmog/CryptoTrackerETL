@@ -48,4 +48,10 @@ public class TokenController {
         return tokenService.getHighestTokenPriceBySymbol(symbol);
     }
 
+    @GetMapping("/top_coins/{n}")
+    public List<Coin> getTopNCoins(@PathVariable int n) {
+        logger.log(Level.INFO, "---------> Get top {0} coins", n);
+        return tokenService.getTopCoins(n);
+    }
+
 }

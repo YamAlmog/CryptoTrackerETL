@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS coins (
     id TEXT,
     symbol TEXT,
     name TEXT,
+    image TEXT,
     curr_timestamp TIMESTAMPTZ NOT NULL DEFAULT now(),
     current_price DOUBLE PRECISION,
     market_cap BIGINT,

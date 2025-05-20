@@ -23,10 +23,10 @@ public class CoinStorageManager {
     public void insertCoinToDB(Coin coin) {
         String sql = """
             INSERT INTO coins (
-                id, symbol, name, current_price,
+                id, symbol, name, image, current_price,
                 market_cap, market_cap_rank, total_volume, high_24h, low_24h,
                 ath, ath_date, atl, atl_date
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (id, curr_timestamp) DO NOTHING;
         """;
     
@@ -36,16 +36,17 @@ public class CoinStorageManager {
             pstmt.setString(1, coin.getId());
             pstmt.setString(2, coin.getSymbol());
             pstmt.setString(3, coin.getName());
-            pstmt.setObject(4, coin.getCurrentPrice(), java.sql.Types.DOUBLE);
-            pstmt.setObject(5, coin.getMarketCap(), java.sql.Types.BIGINT);
-            pstmt.setObject(6, coin.getMarketCapRank(), java.sql.Types.INTEGER);
-            pstmt.setObject(7, coin.getTotalVolume(), java.sql.Types.BIGINT);
-            pstmt.setObject(8, coin.getHigh24h(), java.sql.Types.DOUBLE);
-            pstmt.setObject(9, coin.getLow24h(), java.sql.Types.DOUBLE);
-            pstmt.setObject(10, coin.getAth(), java.sql.Types.DOUBLE);
-            pstmt.setString(11, coin.getAthDate() != null ? coin.getAthDate().toString() : null);
-            pstmt.setObject(12, coin.getAtl(), java.sql.Types.DOUBLE);
-            pstmt.setString(13, coin.getAtlDate() != null ? coin.getAtlDate().toString() : null);
+            pstmt.setString(4, coin.getImage());
+            pstmt.setObject(5, coin.getCurrentPrice(), java.sql.Types.DOUBLE);
+            pstmt.setObject(6, coin.getMarketCap(), java.sql.Types.BIGINT);
+            pstmt.setObject(7, coin.getMarketCapRank(), java.sql.Types.INTEGER);
+            pstmt.setObject(8, coin.getTotalVolume(), java.sql.Types.BIGINT);
+            pstmt.setObject(9, coin.getHigh24h(), java.sql.Types.DOUBLE);
+            pstmt.setObject(10, coin.getLow24h(), java.sql.Types.DOUBLE);
+            pstmt.setObject(11, coin.getAth(), java.sql.Types.DOUBLE);
+            pstmt.setString(12, coin.getAthDate() != null ? coin.getAthDate().toString() : null);
+            pstmt.setObject(13, coin.getAtl(), java.sql.Types.DOUBLE);
+            pstmt.setString(14, coin.getAtlDate() != null ? coin.getAtlDate().toString() : null);
     
             pstmt.executeUpdate();
             logger.log(Level.INFO, "Coin inserted: ", coin.getId());
@@ -100,7 +101,7 @@ public class CoinStorageManager {
 
     public Coin getLatestPriceBySymbol(String symbol) throws SQLException {
         String sql = """
-            SELECT id, symbol, name,curr_timestamp, current_price, market_cap, low_24h, high_24h FROM coins
+            SELECT id, symbol, name, curr_timestamp, current_price, market_cap, low_24h, high_24h FROM coins
             WHERE symbol = ?
             ORDER BY curr_timestamp DESC
             LIMIT 1
@@ -162,4 +163,40 @@ public class CoinStorageManager {
         Coin coin = new Coin(id, coinSymbol, name, currTimestamp, currPrice, marketCap, low24h, high24h);
         return coin;
     }
+
+
+    public List<Coin> getTopCoins(int limit) throws SQLException {
+        String sql = """
+            WITH latest_per_coin AS (
+                SELECT DISTINCT ON (id) * FROM coins ORDER BY id, curr_timestamp DESC
+            )
+            SELECT * FROM latest_per_coin
+            WHERE market_cap_rank IS NOT NULL
+            ORDER BY market_cap_rank ASC
+            LIMIT ?
+            """;
+        List<Coin> coins = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    
+            pstmt.setInt(1, limit);
+            ResultSet rs = pstmt.executeQuery();
+    
+            while (rs.next()) {
+                Coin coin = buildCoinFromResultSet(rs);
+                coin.setImage(rs.getString("image"));
+                coin.setMarketCapRank(rs.getObject("market_cap_rank", Integer.class));
+                coins.add(coin);
+            }
+            return coins;
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error retrieving top records", e);
+            throw e;
+        }
+    }
+
+
+           
+                
+                   
 }

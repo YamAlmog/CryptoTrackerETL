@@ -91,5 +91,24 @@ public class TokenService {
             throw new RuntimeException();
         }
     }
+
+    public List<Coin> getTopCoins(int limit) {
+        try {
+            logger.log(Level.INFO, "Fetching top {0} coins by market cap rank", limit);
+            List<Coin> topCoins = coinStorageManager.getTopCoins(limit);
+            if (topCoins == null || topCoins.isEmpty()) {
+                logger.log(Level.WARNING, "No coins found in top {0} request", limit);
+                throw new CoinNotFoundException("No coins found");
+            }
+            logger.log(Level.INFO, "Top coins response size: {0}", topCoins.size());
+            return topCoins;
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error occurred while fetching top coins", e);
+            throw new RuntimeException("Database error");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Unexpected error occurred while fetching top coins", e);
+            throw new RuntimeException("Unexpected error");
+        }
+    }
 }
 
