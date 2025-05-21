@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Coin Price Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f9f9f9;
+        }
+        .coin-details {
+            max-width: 800px;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            margin: auto;
+        }
+        h1 {
+            margin-bottom: 1.5rem;
+        }
+        h1 img {
+            vertical-align: middle;
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        .price-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            border-top: 1px solid #eaeaea;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .price-info p {
+            margin: 10px 0;
+            flex: 1 0 30%;
+        }
+        .price-info a {
+            color: #3366cc;
+            text-decoration: none;
+            display: block;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .price-info a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            .price-info p {
+                flex: 1 0 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="coin-details" id="coin-details">
+        <p>Loading coin price chart...</p>
+    </div>
+    <script src="coin.js"></script>
+</body>
+</html>
