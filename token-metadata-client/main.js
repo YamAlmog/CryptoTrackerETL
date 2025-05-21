@@ -9,9 +9,9 @@ async function fetchTopCoins() {
 
     const coins = await response.json();
 
-    // Save to localStorage
+    // Save to localStorage so coins can be restored if the page reloads
     localStorage.setItem("lastLimit", limit);
-    localStorage.setItem("lastCoins", JSON.stringify(coins));
+    localStorage.setItem("lastCoins", JSON.stringify(coins)); // localStorage stores only strings
 
     renderCoins(coins);
   } catch (error) {
